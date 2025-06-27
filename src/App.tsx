@@ -1,12 +1,35 @@
 import { useState, useEffect, useRef } from 'react'
 
+interface TimerPreset {
+  id: string;
+  name: string;
+  minutes: number;
+  seconds: number;
+}
+
 function App() {
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [timeLeft, setTimeLeft] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [presets, setPresets] = useState<TimerPreset[]>([])
+  const [presetName, setPresetName] = useState('')
+  const [showSaveForm, setShowSaveForm] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Load presets from localStorage on component mount
+  useEffect(() => {
+    const savedPresets = localStorage.getItem('timerPresets')
+    if (savedPresets) {
+      setPresets(JSON.parse(savedPresets))
+    }
+  }, [])
+
+  // Save presets to localStorage whenever presets change
+  useEffect(() => {
+    localStorage.setItem('timerPresets', JSON.stringify(presets))
+  }, [presets])
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -63,6 +86,32 @@ function App() {
     return ((totalTime - timeLeft) / totalTime) * 100
   }
 
+  const savePreset = () => {
+    if (presetName.trim() && (minutes > 0 || seconds > 0)) {
+      const newPreset: TimerPreset = {
+        id: Date.now().toString(),
+        name: presetName.trim(),
+        minutes,
+        seconds
+      }
+      setPresets([...presets, newPreset])
+      setPresetName('')
+      setShowSaveForm(false)
+    }
+  }
+
+  const loadPreset = (preset: TimerPreset) => {
+    setMinutes(preset.minutes)
+    setSeconds(preset.seconds)
+    setTimeLeft(0)
+    setIsRunning(false)
+    setIsCompleted(false)
+  }
+
+  const deletePreset = (id: string) => {
+    setPresets(presets.filter(preset => preset.id !== id))
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
@@ -103,14 +152,83 @@ function App() {
                     />
                   </div>
                 </div>
-                
-                <button
-                  onClick={startTimer}
-                  disabled={minutes === 0 && seconds === 0}
-                  className="w-full h-14 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                >
-                  スタート
-                </button>
+
+                {/* Save Timer Button */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={startTimer}
+                    disabled={minutes === 0 && seconds === 0}
+                    className="flex-1 h-14 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                  >
+                    スタート
+                  </button>
+                  <button
+                    onClick={() => setShowSaveForm(!showSaveForm)}
+                    disabled={minutes === 0 && seconds === 0}
+                    className="h-14 px-4 bg-gray-200 text-gray-700 rounded-2xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                  >
+                    💾
+                  </button>
+                </div>
+
+                {/* Save Form */}
+                {showSaveForm && (
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-2xl">
+                    <input
+                      type="text"
+                      value={presetName}
+                      onChange={(e) => setPresetName(e.target.value)}
+                      placeholder="プリセット名を入力..."
+                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={savePreset}
+                        disabled={!presetName.trim()}
+                        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
+                      >
+                        保存
+                      </button>
+                      <button
+                        onClick={() => setShowSaveForm(false)}
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white rounded-xl hover:bg-gray-500 transition-colors duration-200 font-medium"
+                      >
+                        キャンセル
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Saved Presets */}
+                {presets.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-gray-600">保存されたプリセット</h3>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {presets.map((preset) => (
+                        <div
+                          key={preset.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
+                        >
+                          <button
+                            onClick={() => loadPreset(preset)}
+                            className="flex-1 text-left"
+                          >
+                            <div className="font-medium text-gray-800">{preset.name}</div>
+                            <div className="text-sm text-gray-500">
+                              {preset.minutes}分 {preset.seconds}秒
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => deletePreset(preset.id)}
+                            className="opacity-0 group-hover:opacity-100 ml-2 px-2 py-1 text-red-500 hover:text-red-700 transition-all duration-200"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
