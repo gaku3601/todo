@@ -14,8 +14,6 @@ function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [presets, setPresets] = useState<TimerPreset[]>([])
-  const [presetName, setPresetName] = useState('')
-  const [showSaveForm, setShowSaveForm] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load presets from localStorage on component mount
@@ -87,16 +85,15 @@ function App() {
   }
 
   const savePreset = () => {
-    if (presetName.trim() && (minutes > 0 || seconds > 0)) {
+    if (minutes > 0 || seconds > 0) {
+      const name = `${minutes}分 ${seconds}秒`
       const newPreset: TimerPreset = {
         id: Date.now().toString(),
-        name: presetName.trim(),
+        name,
         minutes,
         seconds
       }
       setPresets([...presets, newPreset])
-      setPresetName('')
-      setShowSaveForm(false)
     }
   }
 
@@ -159,41 +156,13 @@ function App() {
                     スタート
                   </button>
                   <button
-                    onClick={() => setShowSaveForm(!showSaveForm)}
+                    onClick={savePreset}
                     disabled={minutes === 0 && seconds === 0}
                     className="h-14 px-4 bg-gray-200 text-gray-700 rounded-2xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                   >
                     💾
                   </button>
                 </div>
-
-                {/* Save Form */}
-                {showSaveForm && (
-                  <div className="space-y-4 p-4 bg-gray-50 rounded-2xl">
-                    <input
-                      type="text"
-                      value={presetName}
-                      onChange={(e) => setPresetName(e.target.value)}
-                      placeholder="プリセット名を入力..."
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={savePreset}
-                        disabled={!presetName.trim()}
-                        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
-                      >
-                        保存
-                      </button>
-                      <button
-                        onClick={() => setShowSaveForm(false)}
-                        className="flex-1 px-4 py-2 bg-gray-400 text-white rounded-xl hover:bg-gray-500 transition-colors duration-200 font-medium"
-                      >
-                        キャンセル
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* Saved Presets */}
                 {presets.length > 0 && (
