@@ -117,10 +117,6 @@ function App() {
       <div className="w-full max-w-lg">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
           <div className="px-8 py-6 text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-full mb-6">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-              タイマー
-            </div>
             <h1 className="text-4xl font-bold text-gray-800 mb-2">カウントダウン</h1>
             <p className="text-gray-600">時間を設定してスタートしよう</p>
           </div>
