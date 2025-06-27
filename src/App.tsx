@@ -64,37 +64,42 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="w-full max-w-md mx-4">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
-            <h1 className="text-2xl font-bold text-white text-center">カウントダウンタイマー</h1>
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+          <div className="px-8 py-6 text-center">
+            <div className="inline-flex items-center px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-full mb-6">
+              <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+              タイマー
+            </div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">カウントダウン</h1>
+            <p className="text-gray-600">時間を設定してスタートしよう</p>
           </div>
           
-          <div className="p-6">
+          <div className="px-8 pb-8">
             {!isRunning && timeLeft === 0 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">分</label>
+              <div className="space-y-8">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <label className="block text-sm font-semibold text-gray-600 mb-3">分</label>
                     <input
                       type="number"
                       min="0"
                       max="59"
                       value={minutes}
                       onChange={(e) => setMinutes(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg"
+                      className="w-full h-16 px-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-0 focus:border-purple-400 text-center text-2xl font-bold text-gray-800 transition-all duration-200"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">秒</label>
+                  <div className="text-center">
+                    <label className="block text-sm font-semibold text-gray-600 mb-3">秒</label>
                     <input
                       type="number"
                       min="0"
                       max="59"
                       value={seconds}
                       onChange={(e) => setSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg"
+                      className="w-full h-16 px-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-0 focus:border-purple-400 text-center text-2xl font-bold text-gray-800 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -102,7 +107,7 @@ function App() {
                 <button
                   onClick={startTimer}
                   disabled={minutes === 0 && seconds === 0}
-                  className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium text-lg"
+                  className="w-full h-14 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   スタート
                 </button>
@@ -110,68 +115,86 @@ function App() {
             )}
 
             {(isRunning || timeLeft > 0) && (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <div className="flex items-center justify-center">
-                  <div className="relative w-48 h-48">
+                  <div className="relative w-64 h-64">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle
                         cx="50"
                         cy="50"
                         r="45"
-                        stroke="#e5e7eb"
-                        strokeWidth="8"
+                        stroke="#f3f4f6"
+                        strokeWidth="6"
                         fill="none"
                       />
                       <circle
                         cx="50"
                         cy="50"
                         r="45"
-                        stroke={isCompleted ? "#ef4444" : "#3b82f6"}
-                        strokeWidth="8"
+                        stroke="url(#gradient)"
+                        strokeWidth="6"
                         fill="none"
                         strokeDasharray={283}
                         strokeDashoffset={283 - (283 * getCircleProgress()) / 100}
+                        strokeLinecap="round"
                         className="transition-all duration-1000 ease-linear"
                       />
+                      <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor={isCompleted ? "#ef4444" : "#a855f7"} />
+                          <stop offset="100%" stopColor={isCompleted ? "#dc2626" : "#ec4899"} />
+                        </linearGradient>
+                      </defs>
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className={`text-4xl font-bold ${isCompleted ? 'text-red-500' : 'text-gray-700'}`}>
-                        {formatTime(timeLeft)}
-                      </span>
+                      <div className="text-center">
+                        <span className={`text-5xl font-bold ${isCompleted ? 'text-red-500' : 'text-gray-800'}`}>
+                          {formatTime(timeLeft)}
+                        </span>
+                        <p className="text-sm text-gray-500 mt-2">残り時間</p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   {isRunning ? (
                     <button
                       onClick={stopTimer}
-                      className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium"
+                      className="flex-1 h-12 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                     >
-                      ストップ
+                      ⏸ ストップ
                     </button>
                   ) : (
                     <button
                       onClick={() => setIsRunning(true)}
                       disabled={timeLeft === 0}
-                      className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
+                      className="flex-1 h-12 bg-green-500 text-white rounded-2xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                     >
-                      再開
+                      ▶ 再開
                     </button>
                   )}
                   <button
                     onClick={resetTimer}
-                    className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 font-medium"
+                    className="flex-1 h-12 bg-gray-400 text-white rounded-2xl hover:bg-gray-500 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                   >
-                    リセット
+                    🔄 リセット
                   </button>
                 </div>
               </div>
             )}
 
             {isCompleted && (
-              <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">
-                <p className="font-semibold">時間になりました！</p>
+              <div className="mt-6 p-6 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 text-red-700 rounded-2xl text-center shadow-lg relative">
+                <button
+                  onClick={() => setIsCompleted(false)}
+                  className="absolute top-3 right-3 w-8 h-8 bg-red-200 hover:bg-red-300 text-red-600 rounded-full flex items-center justify-center transition-colors duration-200 text-sm font-bold"
+                >
+                  ✕
+                </button>
+                <div className="text-4xl mb-2">🎉</div>
+                <p className="font-bold text-lg">時間になりました！</p>
+                <p className="text-sm text-red-600 mt-1">お疲れさまでした</p>
               </div>
             )}
           </div>
